@@ -2,6 +2,7 @@ package com.example.cgi_praktika.API.dao.DataObjects;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Flight {
     private final String destination;
@@ -10,7 +11,7 @@ public class Flight {
     private final float flightTime;
     private final float price;
     private final ArrayList<Seat> seats;
-    Flight(String destination, Timestamp departureTime, float flightTime, float price, ArrayList<Seat> seats) {
+    public  Flight(String destination, Timestamp departureTime, float flightTime, float price, ArrayList<Seat> seats) {
         this.destination = destination;
         this.departureTime = departureTime;
         this.flightTime = flightTime;
@@ -28,6 +29,9 @@ public class Flight {
 
     public float getFlightTime() {
         return flightTime;
+    }
+    public List<Seat> getSeats() {
+        return seats;
     }
 
     public float getPrice() {

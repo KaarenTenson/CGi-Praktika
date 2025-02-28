@@ -6,7 +6,7 @@ public class Seat {
     private final float footRoom;
     private final Seat rightSeat;
     private final Seat leftSeat;
-    Seat(int rowID, int columnID, float footRoom, Seat rightSeat, Seat leftSeat) {
+    public Seat(int rowID, int columnID, float footRoom, Seat rightSeat, Seat leftSeat) {
         this.rowID = rowID;
         this.columnID = columnID;
         this.footRoom = footRoom;

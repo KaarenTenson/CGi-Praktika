@@ -16,6 +16,7 @@ public class FlightController {
     }
     @GetMapping("/flights")
     public List<Flight> getFlights(){
+
         return FlightService.getAllFlights();
     }
 }
