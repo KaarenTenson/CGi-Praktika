@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <!-- Link to Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+<div class="container mx-auto p-4">
+    <h1 class="text-3xl font-semibold text-center mb-6">Seating</h1>
+    <!--/*@thymesVar id="flight" type=""*/-->
+    <h2 th:text="'price: ' + ${flight.price}"></h2>
+    <h2 th:text="'departure time: ' + ${flight.departureTime}"></h2>
+    <h2 th:text="'flight time: ' + ${flight.flightTime}"></h2>
+
+
+    <!-- List of destinations -->
+</div>
+
+</body>
+</html>

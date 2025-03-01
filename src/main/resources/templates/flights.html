@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <!-- Link to Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+<div th:fragment="flights" class="container mx-auto p-6">
+    <h1 class="text-4xl font-semibold text-center mb-8 text-blue-600">Flight Information</h1>
+
+    <!-- Table -->
+    <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden border-collapse">
+        <thead class="bg-blue-500 text-white">
+        <tr>
+            <th th:hx-get="@{/flights/{destination}/departureTime(destination=${flights[0].destination})}"
+                hx-trigger="click"
+                hx-target="#tableData"
+                hx-swap="innerHTML"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+                Departure Time
+            </th>
+            <th th:hx-get="@{/flights/{destination}/flightTime(destination=${flights[0].destination})}"
+                hx-trigger="click"
+                hx-target="#tableData"
+                hx-swap="innerHTML"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+                Flight Time
+            </th>
+            <th th:hx-get="@{/flights/{destination}/price(destination=${flights[0].destination})}"
+                hx-trigger="click"
+                hx-target="#tableData"
+                hx-swap="innerHTML"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+                Price
+            </th>
+        </tr>
+        </thead>
+        <tbody id="tableData" class="divide-y divide-gray-200">
+        <tr th:each="flight: ${flights}" class="hover:bg-gray-100 transition-colors"
+            hx-trigger="click"
+            hx-target="body"
+            th:hx-get="@{/flights/seating/{id}(id=${flight.id})}"
+        >
+            <td th:text="${flight.departureTime}" class="px-6 py-4"></td>
+            <td th:text="${flight.flightTime}" class="px-6 py-4"></td>
+            <td th:text="${flight.price}" class="px-6 py-4"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

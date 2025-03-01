@@ -3,8 +3,10 @@ package com.example.cgi_praktika.API.dao.DataObjects;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Flight {
+    private final int id;
     private final String destination;
     private final Timestamp departureTime;
     //in hours
@@ -17,6 +19,9 @@ public class Flight {
         this.flightTime = flightTime;
         this.price = price;
         this.seats = seats;
+        Random rand = new Random();
+        this.id = rand.nextInt(1000000);
+
     }
 
     public String getDestination() {
@@ -32,6 +37,9 @@ public class Flight {
     }
     public List<Seat> getSeats() {
         return seats;
+    }
+    public int getId() {
+        return id;
     }
 
     public float getPrice() {

@@ -14,7 +14,7 @@ public class FlightController {
     public FlightController(InMemoryFlightService flightService) {
         FlightService = flightService;
     }
-    @GetMapping("/flights")
+    @GetMapping("/Allflights")
     public List<Flight> getFlights(){
 
         return FlightService.getAllFlights();
