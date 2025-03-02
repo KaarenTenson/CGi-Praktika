@@ -1,5 +1,6 @@
 package com.example.cgi_praktika.API.dao.Service;
 
+import com.example.cgi_praktika.API.dao.DataGeneration.GenerateFlights;
 import com.example.cgi_praktika.API.dao.DataObjects.Flight;
 import com.example.cgi_praktika.API.dao.DataObjects.Seat;
 import org.springframework.stereotype.Service;
@@ -12,14 +13,7 @@ public class InMemoryFlightService implements FlightService {
     ArrayList<Flight> flights = new ArrayList<>();
 
     public InMemoryFlightService() {
-        ArrayList<Seat> seats = new ArrayList<>();
-        seats.add(new Seat(0, 0, 0.5f, null, null));
-        seats.add(new Seat(1, 0, 0.5f, null, null));
-        seats.add(new Seat(2, 0, 0.5f, null, null));
-        seats.add(new Seat(3, 0, 0.5f, null, null));
-        flights.add(new Flight("Tartu", new Timestamp(1003, 20, 30, 2, 1, 2, 2),30, 30,seats));
-        flights.add(new Flight("Tartu", new Timestamp(1003, 20, 30, 2, 1, 2, 2),29, 31,seats));
-        flights.add(new Flight("Tallinn", new Timestamp(1003, 20, 30, 2, 1, 2, 2),29, 31,seats));
+       flights= GenerateFlights.generateFlights();
     }
 
     @Override

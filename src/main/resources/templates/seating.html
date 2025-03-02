@@ -2,21 +2,117 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-    <!-- Link to Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
 
-<div class="container mx-auto p-4">
-    <h1 class="text-3xl font-semibold text-center mb-6">Seating</h1>
-    <!--/*@thymesVar id="flight" type=""*/-->
-    <h2 th:text="'price: ' + ${flight.price}"></h2>
-    <h2 th:text="'departure time: ' + ${flight.departureTime}"></h2>
-    <h2 th:text="'flight time: ' + ${flight.flightTime}"></h2>
+<div class="container mx-auto p-6">
+    <h1 class="text-4xl font-bold text-center mb-6">Flight Seating</h1>
 
+    <!-- Flight Info -->
+    <div class="bg-white shadow-md p-6 rounded-lg mb-6">
+        <h2 class="text-2xl font-semibold mb-2">✈️ Flight Details</h2>
+        <p class="text-gray-700"><strong>Price per Seat:</strong> <span th:text="${flight.price}"></span></p>
+        <p class="text-gray-700"><strong>Departure Time:</strong> <span th:text="${flight.departureTime}"></span></p>
+        <p class="text-gray-700"><strong>Flight Time:</strong> <span th:text="${flight.flightTime}"></span></p>
+    </div>
 
-    <!-- List of destinations -->
+    <!-- Ticket List -->
+    <div class="bg-white shadow-md p-6 rounded-lg mb-6">
+        <h2 class="text-2xl font-semibold mb-3">🎫 Selected Tickets</h2>
+        <ul id="tickets" class="space-y-2">
+            <!-- Selected seats will be added here -->
+        </ul>
+        <p id="price" class="mt-4 text-lg font-bold">Total: $0</p>
+    </div>
+
+    <!-- Seat Type Legend -->
+    <div class="flex justify-center space-x-4 mb-4">
+        <div class="flex items-center"><div class="w-5 h-5 bg-green-500 border border-gray-300 mr-2"></div> Seat</div>
+        <div class="flex items-center"><div class="w-5 h-5 bg-blue-500 border border-gray-300 mr-2"></div> Door</div>
+        <div class="flex items-center"><div class="w-5 h-5 bg-red-500 border border-gray-300 mr-2"></div> Occupied</div>
+        <div class="flex items-center"><div class="w-5 h-5 bg-gray-300 border border-gray-500 mr-2"></div> Pass through</div>
+    </div>
+
+    <!-- Seating Layout -->
+    <div class="overflow-x-auto bg-white shadow-md p-4 rounded-lg">
+        <table class="border-collapse border border-gray-300 mx-auto">
+            <tbody>
+            <tr th:each="row : ${flight.seats.getPlaneStructure()}" class="even:bg-gray-50">
+                <td th:each="seat : ${row}"
+                    th:text="${seat.row} + ' - ' + ${seat.column}"
+                    th:if="${seat.seatType}"
+                    th:classappend="
+                            ${seat.seatType == 'passThrough'} ? 'invisible' :
+                            (${!seat.isAvailable} ? 'bg-red-500 text-white' :
+                            (${seat.seatType == 'door'} ? 'bg-blue-500 text-white' :
+                            (${seat.seatType == 'seat'} ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-gray-300')))"
+                    class="border border-gray-400 px-6 py-3 text-center font-medium rounded-md shadow-sm"
+                >
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script th:inline="javascript">
+    const price = /*[[${flight.price}]]*/ 0;
+
+    function selectSeat(event) {
+        const seatElement = event.target;
+        const ticketList = document.querySelector("#tickets");
+
+        seatElement.classList.toggle('bg-yellow-500');
+        seatElement.classList.toggle('bg-green-500');
+
+        if (seatElement.classList.contains('bg-yellow-500')) {
+            // Create ticket item
+            const ticketItem = document.createElement("li");
+            ticketItem.classList.add("bg-gray-200", "rounded-lg", "p-2", "shadow-sm", "flex", "justify-between", "items-center");
+            ticketItem.innerHTML = `
+                <span class="text-lg">${seatElement.innerText}</span>
+                <button class="text-red-500 hover:text-red-700 font-bold" onclick="removeTicket(this, '${seatElement.innerText}')">✖</button>
+            `;
+            ticketItem.setAttribute("data-seat", seatElement.innerText);
+            ticketList.appendChild(ticketItem);
+        } else {
+            ticketList.querySelectorAll("li").forEach(ticket => {
+                if (ticket.getAttribute("data-seat") === seatElement.innerText) {
+                    ticket.remove();
+                }
+            });
+        }
+
+        updateTotalPrice();
+    }
+    //chatgpt tehtud
+    function removeTicket(button, seatText) {
+        // Remove the seat highlight
+        document.querySelectorAll("td").forEach(seat => {
+            if (seat.innerText === seatText) {
+                seat.classList.remove("bg-yellow-500");
+                seat.classList.add("bg-green-500");
+            }
+        });
+
+        // Remove the ticket from the list
+        button.parentElement.remove();
+        updateTotalPrice();
+    }
+
+    function updateTotalPrice() {
+        const ticketList = document.querySelector("#tickets");
+        const priceText = document.querySelector("#price");
+        priceText.innerText = "Total: $" + (price * ticketList.children.length);
+    }
+
+    document.querySelectorAll('td').forEach(function(seat) {
+        if (!seat.classList.contains('bg-red-500') && !seat.classList.contains('bg-blue-500')) {
+            seat.addEventListener('click', selectSeat);
+        }
+    });
+</script>
 
 </body>
 </html>

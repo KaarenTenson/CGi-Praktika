@@ -1,11 +1,14 @@
 package com.example.cgi_praktika.API.dao.Controller;
 //import lombok.RequiredArgsConstructor;
+import com.example.cgi_praktika.API.dao.DataObjects.Flight;
 import com.example.cgi_praktika.API.dao.Service.InMemoryFlightService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.ArrayList;
 
 @Controller
 
@@ -21,11 +24,16 @@ public class HTMXcontroller {
         model.addAttribute("destinations", FlightService.getDestinations());
         return "main";
     }
-    @RequestMapping("/flights/{destination}")
-    public String flight(Model model, @PathVariable String destination) {
+    @RequestMapping("/flights/{destination}/page={page}")
+    public String flight(Model model, @PathVariable String destination, @PathVariable int page) {
 
         System.out.println("flight request:" + destination);
-        model.addAttribute("flights", FlightService.getAllFlightsByDestination(destination));
+        ArrayList<Flight> flights = FlightService.getAllFlightsByDestination(destination);
+        int pageCount = flights.size()/30 + Math.min(flights.size()%30, 1);
+        model.addAttribute("page", page);
+        model.addAttribute("pages", pageCount);
+        model.addAttribute("flights", flights.subList((page-1)*30, Math.min(30*page, flights.size())));
+
         return "flights";
     }
     @RequestMapping("/flights/{destination}/{column}")

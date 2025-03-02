@@ -12,8 +12,8 @@ public class Flight {
     //in hours
     private final float flightTime;
     private final float price;
-    private final ArrayList<Seat> seats;
-    public  Flight(String destination, Timestamp departureTime, float flightTime, float price, ArrayList<Seat> seats) {
+    private final Seating seats;
+    public  Flight(String destination, Timestamp departureTime, float flightTime, float price, Seating seats) {
         this.destination = destination;
         this.departureTime = departureTime;
         this.flightTime = flightTime;
@@ -35,7 +35,7 @@ public class Flight {
     public float getFlightTime() {
         return flightTime;
     }
-    public List<Seat> getSeats() {
+    public Seating getSeats() {
         return seats;
     }
     public int getId() {
@@ -46,12 +46,6 @@ public class Flight {
         return price;
     }
     public Seat  getSeatById(int RowId, int ColumnId){
-        for (Seat seat : seats) {
-            if(seat.getRowID() == RowId && seat.getColumnID() == ColumnId){
-                return seat;
-            }
-        }
-        //muuda exceptioniks
-        return null;
+        return this.seats.getPlaneStructure()[RowId][ColumnId];
     }
 }

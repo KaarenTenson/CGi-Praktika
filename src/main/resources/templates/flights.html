@@ -50,8 +50,27 @@
             <td th:text="${flight.flightTime}" class="px-6 py-4"></td>
             <td th:text="${flight.price}" class="px-6 py-4"></td>
         </tr>
+
         </tbody>
+
     </table>
+    <div class="flex flex-col items-center space-y-4">
+        <!-- Page Info -->
+        <p class="text-lg font-semibold text-gray-700">
+            Page <span th:text="${page}"></span> of <span th:text="${pages}"></span>
+        </p>
+
+        <!-- Pagination Buttons -->
+        <div class="flex space-x-2">
+            <button th:each="i : ${#numbers.sequence(1, pages)}"
+                    th:text="${i}"
+                    th:attr="data-url=@{/flights/{destination}/page={page}(destination=${destination}, page=${i})}"
+                    onclick="window.location.href=this.getAttribute('data-url')"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300 disabled:bg-gray-400"
+                    th:classappend="${i == page} ? 'bg-blue-900'">
+            </button>
+        </div>
+    </div>
 </div>
 
 </body>
