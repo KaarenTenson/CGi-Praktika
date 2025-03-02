@@ -5,10 +5,11 @@ import com.example.cgi_praktika.API.dao.Service.InMemoryFlightService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 
@@ -50,6 +51,13 @@ public class HTMXcontroller {
         model.addAttribute("flight", FlightService.getFlightById(id));
 
         return "seating";
+    }
+    @RequestMapping("seating/purchase/{id}")
+    public String purchaseFlight(Model model, @PathVariable int id, @RequestParam Map<String, List<String>> tickets) {
+        System.out.println(tickets);
+        System.out.println(tickets.get("tickets"));
+        model.addAttribute("tickets", tickets.get("tickets"));
+        return "fragments/purchaseConfirmation";
     }
 
 }

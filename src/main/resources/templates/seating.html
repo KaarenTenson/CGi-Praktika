@@ -24,6 +24,13 @@
             <!-- Selected seats will be added here -->
         </ul>
         <p id="price" class="mt-4 text-lg font-bold">Total: $0</p>
+        <button
+                id="purchase-btn"
+                th:hx-get="@{/seating/purchase/{id}(id=${flight.id})}"
+                hx-target="body"
+                hx-swap="afterbegin"
+                hx-headers='{"Content-Type": "application/json"}'
+        >Purchase</button>
     </div>
 
     <!-- Seat Type Legend -->
@@ -106,12 +113,28 @@
         const priceText = document.querySelector("#price");
         priceText.innerText = "Total: $" + (price * ticketList.children.length);
     }
+    function getTickets(){
+        const ticketsList=document.querySelectorAll("#tickets li");
+        const ticketNames=[];
+        ticketsList.forEach(function(ticket){
+            ticketNames.push(ticket.getAttribute("data-seat"));
+        })
+        console.log(ticketNames);
+        return ticketNames;
+    }
 
     document.querySelectorAll('td').forEach(function(seat) {
         if (!seat.classList.contains('bg-red-500') && !seat.classList.contains('bg-blue-500')) {
             seat.addEventListener('click', selectSeat);
         }
     });
+    document.getElementById("purchase-btn").addEventListener("click", function() {
+        this.setAttribute("hx-vals", JSON.stringify({
+            tickets: getTickets()
+        }));
+    });
+
+
 </script>
 
 </body>
