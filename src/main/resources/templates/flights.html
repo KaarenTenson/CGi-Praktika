@@ -6,6 +6,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
+<div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-700 mb-4">Filter Flights</h2>
+    <form id="filterForm" class="space-y-4">
+        <!-- Locations -->
+        <div>
+            <label for="departure" class="block text-sm font-medium text-gray-700">Departure</label>
+            <input type="search" id="departure" name="departure"
+                   class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter departure location">
+        </div>
+
+        <div>
+            <label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
+            <input type="search" id="destination" name="destination"
+                   class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter destination">
+        </div>
+
+        <!-- Price Range -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Price Range</label>
+            <div class="flex space-x-2">
+                <input type="number" id="minPrice" name="minPrice"
+                       class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="Min">
+                <input type="number" id="maxPrice" name="maxPrice"
+                       class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="Max">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit"
+                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+            Apply Filters
+        </button>
+    </form>
+</div>
+
 
 <div th:fragment="flights" class="container mx-auto p-6">
     <h1 class="text-4xl font-semibold text-center mb-8 text-blue-600">Flight Information</h1>
@@ -14,6 +53,21 @@
     <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden border-collapse">
         <thead class="bg-blue-500 text-white">
         <tr>
+
+            <th th:hx-get="@{/flights/{destination}/destination(destination=${flights[0].destination})}"
+                hx-trigger="click"
+                hx-target="#tableData"
+                hx-swap="innerHTML"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >destination</th>
+            <th
+                    th:hx-get="@{/flights/{destination}/departure(destination=${flights[0].destination})}"
+                    hx-trigger="click"
+                    hx-target="#tableData"
+                    hx-swap="innerHTML"
+                    class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    departure
+            </th>
             <th th:hx-get="@{/flights/{destination}/departureTime(destination=${flights[0].destination})}"
                 hx-trigger="click"
                 hx-target="#tableData"
@@ -46,6 +100,8 @@
             hx-target="body"
             th:hx-get="@{/flights/seating/{id}(id=${flight.id})}"
         >
+            <td th:text="${flight.destination}" class="px-6 py-4"></td>
+            <td th:text="${flight.departure}" class="px-6 py-4"></td>
             <td th:text="${flight.departureTime}" class="px-6 py-4"></td>
             <td th:text="${flight.flightTime}" class="px-6 py-4"></td>
             <td th:text="${flight.price}" class="px-6 py-4"></td>
@@ -62,7 +118,8 @@
 
         <!-- Pagination Buttons -->
         <div class="flex space-x-2">
-            <button th:each="i : ${#numbers.sequence(1, pages)}"
+            <button
+                    th:each="i : ${#numbers.sequence(1, pages)}"
                     th:text="${i}"
                     th:attr="data-url=@{/flights/{destination}/page={page}(destination=${destination}, page=${i})}"
                     onclick="window.location.href=this.getAttribute('data-url')"
@@ -72,6 +129,31 @@
         </div>
     </div>
 </div>
+<script>
 
+document.getElementById("filterForm").addEventListener("submit", changePageState);
+function  changePageState(event) {
+    event.preventDefault();
+
+    const destination = document.getElementById("destination").value.trim();
+    if (!destination) {
+        alert("Please enter a destination.");
+        return;
+    }
+
+    const departure = document.getElementById("departure").value.trim();
+    const minPrice = document.getElementById("minPrice").value.trim();
+    const maxPrice = document.getElementById("maxPrice").value.trim();
+    const page = 1;
+
+    const params = new URLSearchParams();
+    if (departure) params.append("departure", departure);
+    if (minPrice) params.append("minPrice", minPrice);
+    if (maxPrice) params.append("maxPrice", maxPrice);
+
+    const url = `/flights/${destination}/page=${page}/filtered?${params.toString()}`;
+    window.location.href = url;
+}
+</script>
 </body>
 </html>

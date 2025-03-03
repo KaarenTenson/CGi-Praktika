@@ -8,13 +8,15 @@ import java.util.Random;
 public class Flight {
     private final int id;
     private final String destination;
+    private final String departure;
     private final Timestamp departureTime;
     //in hours
     private final float flightTime;
     private final float price;
     private final Seating seats;
-    public  Flight(String destination, Timestamp departureTime, float flightTime, float price, Seating seats) {
+    public  Flight(String destination, String departure, Timestamp departureTime, float flightTime, float price, Seating seats) {
         this.destination = destination;
+        this.departure = departure;
         this.departureTime = departureTime;
         this.flightTime = flightTime;
         this.price = price;
@@ -26,6 +28,9 @@ public class Flight {
 
     public String getDestination() {
         return destination;
+    }
+    public String getDeparture() {
+        return departure;
     }
 
     public Timestamp getDepartureTime() {
