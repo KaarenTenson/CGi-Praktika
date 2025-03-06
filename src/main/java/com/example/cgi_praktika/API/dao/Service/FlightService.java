@@ -12,6 +12,6 @@ public interface FlightService {
     public ArrayList<Flight> getAllFlightsByDestination(String dest);
     public ArrayList<String> getDestinations();
     public ArrayList<Flight> getSortedFlights(String destination, String column, Boolean asc);
-    public ArrayList<Flight> getFilteredFlights(int Page, String departure, int minPrice, int maxPrice);
+    public ArrayList<Flight> getFilteredFlights(int Page, String departure,String destination, Integer minPrice, Integer maxPrice);
 
 }

@@ -14,14 +14,18 @@
             <label for="departure" class="block text-sm font-medium text-gray-700">Departure</label>
             <input type="search" id="departure" name="departure"
                    class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                   placeholder="Enter departure location">
+                   placeholder="Enter departure location"
+                   th:value="${departure}"
+            >
         </div>
 
         <div>
             <label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
             <input type="search" id="destination" name="destination"
                    class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                   placeholder="Enter destination">
+                   placeholder="Enter destination"
+                   th:value="${destination}"
+            >
         </div>
 
         <!-- Price Range -->
@@ -30,10 +34,14 @@
             <div class="flex space-x-2">
                 <input type="number" id="minPrice" name="minPrice"
                        class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Min">
+                       placeholder="0"
+                       th:value="${minPrice}"
+                >
                 <input type="number" id="maxPrice" name="maxPrice"
                        class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                       placeholder="Max">
+                       placeholder="1000"
+                       th:value="${maxPrice}"
+                >
             </div>
         </div>
 
@@ -54,21 +62,21 @@
         <thead class="bg-blue-500 text-white">
         <tr>
 
-            <th th:hx-get="@{/flights/{destination}/destination(destination=${flights[0].destination})}"
+            <th th:hx-get="@{/flights/{destination}/destination(destination=${destination})}"
                 hx-trigger="click"
                 hx-target="#tableData"
                 hx-swap="innerHTML"
                 class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
             >destination</th>
             <th
-                    th:hx-get="@{/flights/{destination}/departure(destination=${flights[0].destination})}"
+                    th:hx-get="@{/flights/{destination}/departure(destination=${destination})}"
                     hx-trigger="click"
                     hx-target="#tableData"
                     hx-swap="innerHTML"
                     class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                     departure
             </th>
-            <th th:hx-get="@{/flights/{destination}/departureTime(destination=${flights[0].destination})}"
+            <th th:hx-get="@{/flights/{destination}/departureTime(destination=${destination})}"
                 hx-trigger="click"
                 hx-target="#tableData"
                 hx-swap="innerHTML"
@@ -76,7 +84,7 @@
             >
                 Departure Time
             </th>
-            <th th:hx-get="@{/flights/{destination}/flightTime(destination=${flights[0].destination})}"
+            <th th:hx-get="@{/flights/{destination}/flightTime(destination=${destination})}"
                 hx-trigger="click"
                 hx-target="#tableData"
                 hx-swap="innerHTML"
@@ -84,7 +92,7 @@
             >
                 Flight Time
             </th>
-            <th th:hx-get="@{/flights/{destination}/price(destination=${flights[0].destination})}"
+            <th th:hx-get="@{/flights/{destination}/price(destination=${destination})}"
                 hx-trigger="click"
                 hx-target="#tableData"
                 hx-swap="innerHTML"
@@ -96,10 +104,7 @@
         </thead>
         <tbody id="tableData" class="divide-y divide-gray-200">
         <tr th:each="flight: ${flights}" class="hover:bg-gray-100 transition-colors"
-            hx-trigger="click"
-            hx-target="body"
-            th:hx-get="@{/flights/seating/{id}(id=${flight.id})}"
-        >
+            th:attr="onclick='window.location.href=\'/flights/seating/' + ${flight.id} + '\''">
             <td th:text="${flight.destination}" class="px-6 py-4"></td>
             <td th:text="${flight.departure}" class="px-6 py-4"></td>
             <td th:text="${flight.departureTime}" class="px-6 py-4"></td>
@@ -121,7 +126,7 @@
             <button
                     th:each="i : ${#numbers.sequence(1, pages)}"
                     th:text="${i}"
-                    th:attr="data-url=@{/flights/{destination}/page={page}(destination=${destination}, page=${i})}"
+                    th:data-url="@{'/page/' + ${i} + ${filtered}}"
                     onclick="window.location.href=this.getAttribute('data-url')"
                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300 disabled:bg-gray-400"
                     th:classappend="${i == page} ? 'bg-blue-900'">
@@ -148,10 +153,12 @@ function  changePageState(event) {
 
     const params = new URLSearchParams();
     if (departure) params.append("departure", departure);
+    if (destination) params.append("destination", destination)
     if (minPrice) params.append("minPrice", minPrice);
     if (maxPrice) params.append("maxPrice", maxPrice);
 
-    const url = `/flights/${destination}/page=${page}/filtered?${params.toString()}`;
+
+    const url = `/page/${page}/filtered?${params.toString()}`;
     window.location.href = url;
 }
 </script>

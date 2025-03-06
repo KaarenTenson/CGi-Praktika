@@ -18,6 +18,7 @@ import java.util.*;
 
 //@RequiredArgsConstructor
 public class HTMXcontroller {
+    public int pageSize=30;
     private InMemoryFlightService FlightService;
     @Autowired
     public HTMXcontroller(InMemoryFlightService flightService) {
@@ -25,35 +26,59 @@ public class HTMXcontroller {
     }
     @RequestMapping("/")
     public String index(Model model) {
-        model.addAttribute("destinations", FlightService.getDestinations());
-        return "main";
+        List<Flight> flights=FlightService.getAllFlights();
+        int pageCount = flights.size()/pageSize + Math.min(flights.size()%pageSize, 1);
+        model.addAttribute("page", 1);
+        model.addAttribute("pages", pageCount);
+        model.addAttribute("flights", flights.subList(0, Math.min(pageSize, flights.size())));
+        model.addAttribute("filtered", "/page="+1);
+        return "flights";
     }
-    @RequestMapping("/flights/{destination}/page={page}/filtered")
-    public String flightFiltered(Model model, @PathVariable String destination, @PathVariable int page, @RequestParam(required = false) String departure, @RequestParam(required = false) int minPrice, @RequestParam(required = false) int maxPrice) {
+    @RequestMapping("/page/{page}/filtered")
+    public String flightFiltered(
+            Model model,
+            @PathVariable int page,
+            @RequestParam(required = false) String departure,
+            @RequestParam(required = false) String destination,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice
+    ) {
+        StringBuilder filteredUrl = new StringBuilder("/filtered?");
 
-        System.out.println(departure);
-        System.out.println(minPrice);
-        System.out.println(maxPrice);
+        if (departure != null) filteredUrl.append("departure=").append(departure).append("&");
+        if (destination != null) filteredUrl.append("destination=").append(destination).append("&");
+        if (minPrice != null) filteredUrl.append("minPrice=").append(minPrice).append("&");
+        if (maxPrice != null) filteredUrl.append("maxPrice=").append(maxPrice).append("&");
 
-        ArrayList<Flight> flights = FlightService.getFilteredFlights(page, departure, minPrice, maxPrice);
-        System.out.println(flights);
-        int pageCount = flights.size()/30 + Math.min(flights.size()%30, 1);
-        System.out.println(pageCount);
+        // Remove the last "&" if there are parameters
+        if (filteredUrl.charAt(filteredUrl.length() - 1) == '&') {
+            filteredUrl.deleteCharAt(filteredUrl.length() - 1);
+        }
+        System.out.println(filteredUrl.toString());
+        // Add attributes to the model
+        ArrayList<Flight> flights = FlightService.getFilteredFlights(page, departure, destination, minPrice, maxPrice);
+        int pageCount = flights.size() / pageSize + Math.min(flights.size() % pageSize, 1);
+
         model.addAttribute("page", page);
         model.addAttribute("pages", pageCount);
-        model.addAttribute("flights", flights.subList((page-1)*30, Math.min(30*page, flights.size())));
+        model.addAttribute("departure", departure == null ? "" : departure);
+        model.addAttribute("destination", destination == null ? "" : destination);
+        model.addAttribute("minPrice",  minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("flights", flights.subList((page - 1) * pageSize, Math.min(pageSize * page, flights.size())));
+        model.addAttribute("filtered", filteredUrl.toString()); // Pass the filtered URL
 
         return "flights";
     }
-    @RequestMapping("/flights/{destination}/page={page}")
-    public String flight(Model model, @PathVariable String destination, @PathVariable int page) {
 
-        System.out.println("flight request:" + destination);
-        ArrayList<Flight> flights = FlightService.getAllFlightsByDestination(destination);
-        int pageCount = flights.size()/30 + Math.min(flights.size()%30, 1);
+    @RequestMapping("/page={page}")
+    public String flight(Model model, @PathVariable int page) {
+
+        List<Flight> flights = FlightService.getAllFlights();
+        int pageCount = flights.size()/pageSize + Math.min(flights.size()%pageSize, 1);
         model.addAttribute("page", page);
         model.addAttribute("pages", pageCount);
-        model.addAttribute("flights", flights.subList((page-1)*30, Math.min(30*page, flights.size())));
+        model.addAttribute("flights", flights.subList((page-1)*pageSize, Math.min(pageSize*page, flights.size())));
 
         return "flights";
     }

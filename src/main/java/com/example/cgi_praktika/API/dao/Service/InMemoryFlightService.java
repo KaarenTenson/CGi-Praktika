@@ -77,11 +77,17 @@ public class InMemoryFlightService implements FlightService {
     }
 
     @Override
-    public ArrayList<Flight> getFilteredFlights(int Page, String departure, int minPrice, int maxPrice) {
+    public ArrayList<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice) {
         ArrayList<Flight> filteredFlights = new ArrayList<>();
         for (Flight flight : flights) {
-            if(!flight.getDeparture().equals(departure)){continue;}
-            if(flight.getPrice()<minPrice ||flight.getPrice()>maxPrice){continue;}
+            if(departure!=null)
+                if(!flight.getDeparture().equals(departure)){continue;}
+            if(destination!=null)
+                if(!flight.getDestination().equals(destination)){continue;}
+            if(minPrice!=null)
+                if(flight.getPrice()<minPrice){continue;}
+            if(maxPrice!=null)
+                if(flight.getPrice()>maxPrice){continue;}
             filteredFlights.add(flight);
         }
         return filteredFlights;
