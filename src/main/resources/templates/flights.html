@@ -11,6 +11,14 @@
     <form id="filterForm" class="space-y-4">
         <!-- Locations -->
         <div>
+            <label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
+            <input type="search" id="destination" name="destination"
+                   class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Enter destination"
+                   th:value="${destination}"
+            >
+        </div>
+        <div>
             <label for="departure" class="block text-sm font-medium text-gray-700">Departure</label>
             <input type="search" id="departure" name="departure"
                    class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
@@ -19,14 +27,7 @@
             >
         </div>
 
-        <div>
-            <label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
-            <input type="search" id="destination" name="destination"
-                   class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                   placeholder="Enter destination"
-                   th:value="${destination}"
-            >
-        </div>
+
 
         <!-- Price Range -->
         <div>
@@ -41,6 +42,22 @@
                        class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                        placeholder="1000"
                        th:value="${maxPrice}"
+                >
+            </div>
+        </div>
+        <!-- Time range-->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Start Time</label>
+            <div class="flex space-x-2">
+                <input type="datetime-local" id="minTime" name="minTime"
+                       class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="0"
+                       th:value="${minTime}"
+                >
+                <input type="datetime-local" id="maxTime" name="maxTime"
+                       class="w-1/2 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                       placeholder="1000"
+                       th:value="${maxTime}"
                 >
             </div>
         </div>
@@ -62,44 +79,41 @@
         <thead class="bg-blue-500 text-white">
         <tr>
 
-            <th th:hx-get="@{/flights/{destination}/destination(destination=${destination})}"
-                hx-trigger="click"
-                hx-target="#tableData"
-                hx-swap="innerHTML"
-                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >destination</th>
-            <th
-                    th:hx-get="@{/flights/{destination}/departure(destination=${destination})}"
-                    hx-trigger="click"
-                    hx-target="#tableData"
-                    hx-swap="innerHTML"
-                    class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    departure
+            <th th:data-url="@{'/page/1/filtered?' + ${filtered} + '&sorting=destination&asc=' + ${sorting!=null && sorting.equals('destination')? !asc.booleanValue():true} }"
+                onclick="window.location.href=this.getAttribute('data-url')"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                Destination
+                <span th:if="${sorting == 'destination'}" th:text="${asc} ? '↑' : '↓'"></span>
             </th>
-            <th th:hx-get="@{/flights/{destination}/departureTime(destination=${destination})}"
-                hx-trigger="click"
-                hx-target="#tableData"
-                hx-swap="innerHTML"
-                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
+
+            <th th:data-url="@{'/page/1/filtered?' + ${filtered} + '&sorting=departure&asc=' + ${sorting!=null && sorting.equals('departure')? !asc.booleanValue():true} }"
+                onclick="window.location.href=this.getAttribute('data-url')"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                Departure
+                <span th:if="${sorting == 'departure'}" th:text="${asc} ? '↑' : '↓'"></span>
+            </th>
+
+            <th th:data-url="@{'/page/1/filtered?'  + ${filtered} + '&sorting=departureTime&asc=' + ${sorting!=null &&sorting.equals('departureTime')? !asc.booleanValue():true} }"
+                onclick="window.location.href=this.getAttribute('data-url')"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                 Departure Time
+                <span th:if="${sorting == 'departureTime'}" th:text="${asc} ? '↑' : '↓'"></span>
             </th>
-            <th th:hx-get="@{/flights/{destination}/flightTime(destination=${destination})}"
-                hx-trigger="click"
-                hx-target="#tableData"
-                hx-swap="innerHTML"
-                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
+
+            <th th:data-url="@{'/page/1/filtered?' + ${filtered} + '&sorting=flightTime&asc=' + ${sorting!=null && sorting.equals('flightTime')? !asc.booleanValue():true} }"
+                onclick="window.location.href=this.getAttribute('data-url')"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                 Flight Time
+                <span th:if="${sorting == 'flightTime'}" th:text="${asc} ? '↑' : '↓'"></span>
             </th>
-            <th th:hx-get="@{/flights/{destination}/price(destination=${destination})}"
-                hx-trigger="click"
-                hx-target="#tableData"
-                hx-swap="innerHTML"
-                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            >
+
+            <th th:data-url="@{'/page/1/filtered?' + ${filtered} + '&sorting=price&asc=' + ${sorting!=null && sorting.equals('price')? !asc.booleanValue():true} }"
+                onclick="window.location.href=this.getAttribute('data-url')"
+                class="px-6 py-3 text-left cursor-pointer hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                 Price
+                <span th:if="${sorting == 'price'}" th:text="${asc} ? '↑' : '↓'"></span>
             </th>
+
         </tr>
         </thead>
         <tbody id="tableData" class="divide-y divide-gray-200">
@@ -107,8 +121,9 @@
             th:attr="onclick='window.location.href=\'/flights/seating/' + ${flight.id} + '\''">
             <td th:text="${flight.destination}" class="px-6 py-4"></td>
             <td th:text="${flight.departure}" class="px-6 py-4"></td>
-            <td th:text="${flight.departureTime}" class="px-6 py-4"></td>
-            <td th:text="${flight.flightTime}" class="px-6 py-4"></td>
+            <td th:text="${#temporals.format(flight.departureTime, 'dd-MM-yyyy HH:mm')}" class="px-6 py-4"></td>
+            <!--/*@thymesVar id="Duration" type="java.time.Duration"*/-->
+            <td th:text="${#numbers.formatDecimal(flight.flightTime / 60, 0, 0)} + 'h ' + ${#numbers.formatDecimal(flight.flightTime % 60, 0, 0)} + 'm'" class="px-6 py-4"></td>
             <td th:text="${flight.price}" class="px-6 py-4"></td>
         </tr>
 
@@ -123,13 +138,42 @@
 
         <!-- Pagination Buttons -->
         <div class="flex space-x-2">
-            <button
-                    th:each="i : ${#numbers.sequence(1, pages)}"
-                    th:text="${i}"
-                    th:data-url="@{'/page/' + ${i} + ${filtered}}"
+            <button th:if="${pages > 0}"
+                    th:data-url="@{'/page/' + 1+${filtered.isEmpty()&&sorting==null? '':'/filtered?'} + ${filtered} + ${sorting != null ? '&sorting=' + sorting : ''} + ${sorting != null ? '&asc=' + asc : ''}}"
                     onclick="window.location.href=this.getAttribute('data-url')"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300 disabled:bg-gray-400"
-                    th:classappend="${i == page} ? 'bg-blue-900'">
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
+                1
+            </button>
+            <a
+            th:if="${pages>2}">
+                ...
+            </a>
+            <button th:if="${page > 2}"
+                    th:text="${previousPage}"
+                    th:data-url="@{'/page/' + ${previousPage} +${filtered.isEmpty()&&sorting==null? '':'/filtered?'}+  ${filtered} + ${sorting != null ? '&sorting=' + sorting : ''} + ${sorting != null ? '&asc=' + asc : ''}}"
+                    onclick="window.location.href=this.getAttribute('data-url')"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
+            </button>
+            <button th:if="${page > 1}"
+                    th:text="${page}"
+                    th:data-url="@{'/page/' + ${page}  + ${filtered.isEmpty()&&sorting==null? '':'/filtered?'}+  ${filtered} + ${sorting != null ? '&sorting=' + sorting : ''} + ${sorting != null ? '&asc=' + asc : ''}}"
+                    onclick="window.location.href=this.getAttribute('data-url')"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-900 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
+            </button>
+            <button th:if="${pages > 2 && page+2<pages}"
+                    th:text="${nextPage}"
+                    th:data-url="@{'/page/' + ${nextPage} + ${filtered.isEmpty()&&sorting==null? '':'/filtered?'}+ ${filtered} + ${sorting != null ? '&sorting=' + sorting : ''} + ${sorting != null ? '&asc=' + asc : ''}}"
+                    onclick="window.location.href=this.getAttribute('data-url')"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
+            </button>
+            <a th:if="${pages > 2 && page!=pages}">
+            ...
+            </a>
+            <button th:if="${pages > 2 && page!=pages}"
+                    th:text="${pages}"
+                    th:data-url="@{'/page/' + ${pages} + ${filtered.isEmpty()&&sorting==null? '':'/filtered?'} +  ${filtered} + ${sorting != null ? '&sorting=' + sorting : ''} + ${sorting != null ? '&asc=' + asc : ''}}"
+                    onclick="window.location.href=this.getAttribute('data-url')"
+                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
             </button>
         </div>
     </div>
@@ -149,6 +193,8 @@ function  changePageState(event) {
     const departure = document.getElementById("departure").value.trim();
     const minPrice = document.getElementById("minPrice").value.trim();
     const maxPrice = document.getElementById("maxPrice").value.trim();
+    const minTime= document.getElementById("minTime").value.trim();
+    const maxTime= document.getElementById("maxTime").value.trim();
     const page = 1;
 
     const params = new URLSearchParams();
@@ -156,6 +202,8 @@ function  changePageState(event) {
     if (destination) params.append("destination", destination)
     if (minPrice) params.append("minPrice", minPrice);
     if (maxPrice) params.append("maxPrice", maxPrice);
+    if (minTime) params.append("minTime", minTime)
+    if (maxTime) params.append("maxTime", maxTime)
 
 
     const url = `/page/${page}/filtered?${params.toString()}`;

@@ -38,6 +38,13 @@
         <div class="flex items-center"><div class="w-5 h-5 bg-red-500 border border-gray-300 mr-2"></div> Occupied</div>
         <div class="flex items-center"><div class="w-5 h-5 bg-gray-300 border border-gray-500 mr-2"></div> Pass through</div>
     </div>
+    <!-- Seat Type Legend -->
+    <div class="flex justify-center space-x-4 mb-4">
+        <label for="seatCount">choose number of seats</label><input type="number" name="number of seats" id="seatCount">
+        <label for="nearWindow">Seats are near the windows</label><input type="checkbox" name="nearWindow" id="nearWindow">
+        <button onclick="recommendSeats()">recommend</button>
+
+    </div>
 
     <!-- Seating Layout -->
     <div class="overflow-x-auto bg-white shadow-md p-4 rounded-lg">
@@ -46,6 +53,7 @@
             <tr th:each="row : ${flight.seats.getPlaneStructure()}" class="even:bg-gray-50">
                 <td th:each="seat : ${row}"
                     th:text="${seat.row} + ' - ' + ${seat.column}"
+                    th:attr="id=${seat.row} + '-' + ${seat.column}"
                     th:if="${seat.seatType}"
                     th:classappend="
                             ${seat.seatType == 'passThrough'} ? 'invisible' :
@@ -65,9 +73,14 @@
     const price = /*[[${flight.price}]]*/ 0;
     const flightId = /*[[${flight.id}]]*/ 0;
     const tickets=[]
-
-    function selectSeat(event) {
+    const seats =  /*[[${flight.seats.getPlaneStructure()}]]*/ null;
+    const chosenSeats=[]
+    //console.log(seats)
+    function seatSelectedEvent(event){
         const seatElement = event.target;
+        selectSeat(seatElement);
+    }
+    function selectSeat(seatElement) {
         const ticketList = document.querySelector("#tickets");
 
         seatElement.classList.toggle('bg-yellow-500');
@@ -94,18 +107,18 @@
 
         updateTotalPrice();
     }
-    //chatgpt tehtud
     function removeTicket(button, seatText) {
-        // Remove the seat highlight
         document.querySelectorAll("td").forEach(seat => {
             if (seat.innerText === seatText) {
-                tickets.splice(tickets.findIndex(seat.innerText), 1)
+                tickets.splice(
+                    tickets.findIndex(ticket => ticket === seat.innerText),
+                    1
+                );
                 seat.classList.remove("bg-yellow-500");
                 seat.classList.add("bg-green-500");
             }
         });
 
-        // Remove the ticket from the list
         button.parentElement.remove();
         updateTotalPrice();
     }
@@ -123,12 +136,33 @@
         })
         return ticketNames;
     }
-
-    document.querySelectorAll('td').forEach(function(seat) {
-        if (!seat.classList.contains('bg-red-500') && !seat.classList.contains('bg-blue-500')) {
-            seat.addEventListener('click', selectSeat);
+    function clearTickets(){
+        const ticketsList=document.querySelectorAll("#tickets li");
+        ticketsList.forEach(function(ticket){
+            removeTicket(ticket.childNodes.item(0), ticket.getAttribute("data-seat"));
+        })
+    }
+    function recommendSeats(){
+        clearTickets()
+        const numberOfSeats=document.getElementById("seatCount").value;
+        const nearWindows=document.getElementById("nearWindow").value;
+        let seatRecommended=0;
+        console.log(seats)
+        for (const row in seats){
+            console.log(row)
+            for(const column in seats[row]){
+                let seat=seats[row][column]
+                if(seat.isAvailable && seat.seatType==="seat"){
+                    console.log(seat)
+                    selectSeat(document.getElementById(seat.row + '-' + seat.column));
+                    seatRecommended+=1;
+                }
+                if(seatRecommended>=numberOfSeats){
+                    return;
+                }
+            }
         }
-    });
+    }
     function purchaseSeats() {
         const tickets = getTickets();
         console.log("Tickets:", tickets); // Debugging
@@ -149,29 +183,14 @@
             console.error('Error:', error);
         });
     }
-    function sendTestRequest() {
-        const tickets = getTickets(); // Assuming getTickets() is defined in your code
-        const url = '/seating/purchase/1'; // Replace with your actual URL
 
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: jsonData,
-        })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.text(); // or response.json() if you expect JSON back
-            })
-            .then(data => {
-                console.log('Response data:', data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+    document.querySelectorAll('td').forEach(function(seat) {
+        if (!seat.classList.contains('bg-red-500') && !seat.classList.contains('bg-blue-500')) {
+            seat.addEventListener('click', seatSelectedEvent);
+        }
+    });
+
 
 
 

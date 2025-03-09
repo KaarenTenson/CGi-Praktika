@@ -6,6 +6,7 @@ import com.example.cgi_praktika.API.dao.DataObjects.Seat;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -77,7 +78,8 @@ public class InMemoryFlightService implements FlightService {
     }
 
     @Override
-    public ArrayList<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice) {
+    public List<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice,
+                                                LocalDateTime minTime, LocalDateTime maxTime, String sorting, Boolean asc) {
         ArrayList<Flight> filteredFlights = new ArrayList<>();
         for (Flight flight : flights) {
             if(departure!=null)
@@ -88,8 +90,35 @@ public class InMemoryFlightService implements FlightService {
                 if(flight.getPrice()<minPrice){continue;}
             if(maxPrice!=null)
                 if(flight.getPrice()>maxPrice){continue;}
+            if(minTime!=null)
+                if (flight.getDepartureTime().isBefore(minTime)){continue;}
+            if(maxTime!=null)
+                if (flight.getDepartureTime().isAfter(minTime)){continue;}
             filteredFlights.add(flight);
         }
+        if(sorting==null){
+            return filteredFlights;
+        }
+        switch (sorting){
+            case "departure":
+                filteredFlights.sort(Comparator.comparing(Flight::getDeparture));
+                break;
+            case "destination":
+                filteredFlights.sort(Comparator.comparing(Flight::getDestination));
+                break;
+            case "price":
+                filteredFlights.sort(Comparator.comparing(Flight::getPrice));
+                break;
+            case "departureTime":
+                filteredFlights.sort(Comparator.comparing(Flight::getDepartureTime));
+                break;
+            case "flightTime":
+                filteredFlights.sort(Comparator.comparing(Flight::getFlightTime));
+        }
+        if(!asc){
+            return filteredFlights.reversed();
+        }
+
         return filteredFlights;
     }
 }
