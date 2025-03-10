@@ -47,26 +47,37 @@
     </div>
 
     <!-- Seating Layout -->
-    <div class="overflow-x-auto bg-white shadow-md p-4 rounded-lg">
-        <table class="border-collapse border border-gray-300 mx-auto">
+    <div class="bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-400 w-fit mx-auto">
+        <table class="border-collapse border border-gray-300 mx-auto bg-white rounded-lg shadow-md">
             <tbody>
             <tr th:each="row : ${flight.seats.getPlaneStructure()}" class="even:bg-gray-50">
+                <!-- Left Window -->
+                <td class="w-10"
+                    th:classappend="${flight.seats.windows[row[0].row][0]==1} ? 'bg-blue-400 rounded-md shadow-sm' : 'invisible'">
+                </td>
+
+                <!-- Seats -->
                 <td th:each="seat : ${row}"
                     th:text="${seat.row} + ' - ' + ${seat.column}"
                     th:attr="id=${seat.row} + '-' + ${seat.column}"
                     th:if="${seat.seatType}"
                     th:classappend="
-                            ${seat.seatType == 'passThrough'} ? 'invisible' :
-                            (${!seat.isAvailable} ? 'bg-red-500 text-white' :
-                            (${seat.seatType == 'door'} ? 'bg-blue-500 text-white' :
-                            (${seat.seatType == 'seat'} ? 'bg-green-500 hover:bg-green-600 cursor-pointer' : 'bg-gray-300')))"
-                    class="border border-gray-400 px-6 py-3 text-center font-medium rounded-md shadow-sm"
-                >
+                        ${seat.seatType == 'passThrough'} ? 'invisible' :
+                        (${!seat.isAvailable} ? 'bg-red-600 text-white' :
+                        (${seat.seatType == 'door'} ? 'bg-blue-700 text-white font-bold' :
+                        (${seat.seatType == 'seat'} ? 'bg-green-500 hover:text-white cursor-pointer border-1 border-green-700' : 'bg-gray-300')))"
+                    class="border border-gray-400 px-6 py-3 text-center font-medium rounded-lg shadow-md">
+                </td>
+
+                <!-- Right Window -->
+                <td class="w-10"
+                    th:classappend="${flight.seats.windows[row[0].row][1]==1} ? 'bg-blue-400 rounded-md shadow-sm' : 'invisible'">
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
+
 </div>
 
 <script th:inline="javascript">
