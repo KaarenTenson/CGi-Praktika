@@ -13,9 +13,11 @@
     <!-- Flight Info -->
     <div class="bg-white shadow-md p-6 rounded-lg mb-6">
         <h2 class="text-2xl font-semibold mb-2">✈️ Flight Details</h2>
+        <p class="text-gray-700"><strong>Destination:</strong> <span th:text="${flight.destination}"></span></p>
+        <p class="text-gray-700"><strong>Departure:</strong> <span th:text="${flight.departure}"></span></p>
         <p class="text-gray-700"><strong>Price per Seat:</strong> <span th:text="${flight.price}"></span></p>
-        <p class="text-gray-700"><strong>Departure Time:</strong> <span th:text="${flight.departureTime}"></span></p>
-        <p class="text-gray-700"><strong>Flight Time:</strong> <span th:text="${flight.flightTime}"></span></p>
+        <p class="text-gray-700"><strong>Departure Time:</strong> <span th:text="${#temporals.format(flight.departureTime, 'dd-MM-yyyy HH:mm')}"></span></p>
+        <p class="text-gray-700"><strong>Flight Time:</strong> <span th:text="${#numbers.formatDecimal(flight.flightTime / 60, 0, 0)} + 'h ' + ${#numbers.formatDecimal(flight.flightTime % 60, 0, 0)}"></span></p>
     </div>
 
     <!-- Ticket List -->
@@ -25,9 +27,13 @@
             <!-- Selected seats will be added here -->
         </ul>
         <p id="price" class="mt-4 text-lg font-bold">Total: $0</p>
-        <button
+        <button class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition"
                 id="purchase-btn"
-                onclick="purchaseSeats()"
+                hx-swap="afterbegin"
+                hx-target="body"
+                th:hx-post="'/seating/purchase/' + ${flight.id}"
+                hx-vals='js:{tickets: getTickets()}'
+                hx-ext="json-enc"
         >Purchase</button>
     </div>
 
@@ -38,12 +44,16 @@
         <div class="flex items-center"><div class="w-5 h-5 bg-red-500 border border-gray-300 mr-2"></div> Occupied</div>
         <div class="flex items-center"><div class="w-5 h-5 bg-gray-300 border border-gray-500 mr-2"></div> Pass through</div>
     </div>
-    <!-- Seat Type Legend -->
-    <div class="flex justify-center space-x-4 mb-4">
-        <label for="seatCount">choose number of seats</label><input type="number" name="number of seats" id="seatCount">
-        <label for="nearWindow">Seats are near the windows</label><input type="checkbox" name="nearWindow" id="nearWindow">
-        <button onclick="recommendSeats()">recommend</button>
-
+    <div class="flex flex-col items-center space-y-4 p-4 bg-gray-100 rounded-lg shadow-md">
+        <div class="flex items-center space-x-2">
+            <label for="seatCount" class="text-gray-700 font-medium">Choose number of seats:</label>
+            <input type="number" name="number of seats" id="seatCount" class="border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" name="nearWindow" id="nearWindow" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+            <label for="nearWindow" class="text-gray-700 font-medium">Seats near the windows</label>
+        </div>
+        <button onclick="recommendSeats()" class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition">Recommend</button>
     </div>
 
     <!-- Seating Layout -->
@@ -63,9 +73,10 @@
                     th:if="${seat.seatType}"
                     th:classappend="
                         ${seat.seatType == 'passThrough'} ? 'invisible' :
-                        (${!seat.isAvailable} ? 'bg-red-600 text-white' :
                         (${seat.seatType == 'door'} ? 'bg-blue-700 text-white font-bold' :
-                        (${seat.seatType == 'seat'} ? 'bg-green-500 hover:text-white cursor-pointer border-1 border-green-700' : 'bg-gray-300')))"
+                        (${!seat.isAvailable and seat.seatType == 'seat'} ? 'bg-red-600 text-white' :
+                        (${seat.seatType == 'seat'} ? 'bg-green-500 hover:text-white cursor-pointer border-1 border-green-700' :
+                        'bg-gray-300')))"
                     class="border border-gray-400 px-6 py-3 text-center font-medium rounded-lg shadow-md">
                 </td>
 
@@ -85,7 +96,7 @@
     const flightId = /*[[${flight.id}]]*/ 0;
     const tickets=[]
     const seats =  /*[[${flight.seats.getPlaneStructure()}]]*/ null;
-    const chosenSeats=[]
+    const windows =  /*[[${flight.seats.getWindows()}]]*/ null;
     //console.log(seats)
     function seatSelectedEvent(event){
         const seatElement = event.target;
@@ -155,39 +166,92 @@
     }
     function recommendSeats(){
         clearTickets()
-        const numberOfSeats=document.getElementById("seatCount").value;
+        const numberOfSeats=parseInt(document.getElementById("seatCount").value);
         const nearWindows=document.getElementById("nearWindow").value;
+        const result=findGoodSeats(windows, nearWindows ? 1 : 0.25, numberOfSeats);
+        if(result.length!==0){
+            result.forEach(function (seat){
+                selectSeat(document.getElementById(seat.row+"-"+seat.column));
+            })
+        }else{
+            findNotSoGoodSeats(numberOfSeats).forEach(function (seat){
+                selectSeat(document.getElementById(seat.row+"-"+seat.column));
+            })
+        }
+
+
+    }
+    function findNotSoGoodSeats(numberOfSeats){
         let seatRecommended=0;
-        console.log(seats)
+        let res=[];
         for (const row in seats){
-            console.log(row)
             for(const column in seats[row]){
-                let seat=seats[row][column]
+                let seat=seats[row][column];
                 if(seat.isAvailable && seat.seatType==="seat"){
-                    console.log(seat)
-                    selectSeat(document.getElementById(seat.row + '-' + seat.column));
+                    res.push(seat);
                     seatRecommended+=1;
                 }
                 if(seatRecommended>=numberOfSeats){
-                    return;
+                    return res;
                 }
             }
         }
     }
+    function findGoodSeats( windows, windowPoints, numberOfSeats){
+        let result=[];
+        let maxPoints=0;
+        for (const row in seats){
+            for(const column in seats[row]){
+                let seatsFound=[];
+                let points=0;
+                for( let i = parseInt(column); i < (parseInt(column) + numberOfSeats); i++){
+                    if(i >= seats[row].length){
+                        break;
+                    }
+                    if(seats[row][i].isAvailable){
+                        seatsFound.push(seats[row][i])
+                        points++;
+                    }else if (seats[row+1]!=null && seats[row+1][i].isAvailable){
+                        seatsFound.push(seats[row][i])
+                        points+=0.5;
+                    }else if (seats[row-1]!=null && seats[row-1][i].isAvailable){
+                        seatsFound.push(seats[row][i])
+                        points+=0.5;
+                    }else{
+                        break;
+                    }
+                    if(i===0&&windows[row][0]===1){
+                        points+=windowPoints;
+                    }else if(i===seats[row].length-1&&windows[row][0]===1){
+                        points+=windowPoints;
+                    }
+                    if (seatsFound.length === numberOfSeats) {
+                        if (points > maxPoints) {
+                            maxPoints = points;
+                            result = seatsFound;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return result
+    }
     function purchaseSeats() {
         const tickets = getTickets();
         console.log("Tickets:", tickets); // Debugging
-        var JsonData={tickets: tickets};
+        var JsonData=JSON.stringify({"tickets": tickets});
+        console.log(JsonData);
+        htmx.logAll();
         htmx.ajax('POST', '/seating/purchase/' + flightId, {
             headers: {
                 'Content-Type': 'application/json'
             },
             swap: 'afterbegin',
             target: 'body',
-            values: JsonData, // Pass the raw object (HTMX will encode it)
-            ext: {
-                'json-enc': true  // Enable JSON encoding extension
-            }
+            values: JsonData,
+            ext:"json-enc"
+
         }).then(function(response) {
             console.log('Response:', response);
         }).catch(function(error) {
@@ -197,7 +261,7 @@
 
 
     document.querySelectorAll('td').forEach(function(seat) {
-        if (!seat.classList.contains('bg-red-500') && !seat.classList.contains('bg-blue-500')) {
+        if (seat.classList.contains('bg-green-500')) {
             seat.addEventListener('click', seatSelectedEvent);
         }
     });

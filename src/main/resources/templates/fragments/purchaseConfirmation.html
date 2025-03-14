@@ -1,20 +1,19 @@
-<div id="purchase-panel">
-    <h1>Purchase confirmation</h1>
-    <h2>Tickets</h2>
-    <ul>
-        <li th:each="ticket:${tickets}"
-            th:text="${ticket}"
-        ></li>
-    </ul>
-    <h1></h1>
-    <div>
-        <button type="button" id="cancel-btn">Cancel</button>
-        <button type="button">Confirm</button>
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="purchase-panel" class="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+        <h1 class="text-2xl font-bold mb-4">Purchase Confirmation</h1>
+        <h2 class="text-lg font-semibold mb-2">Tickets</h2>
+        <ul class="list-disc list-inside mb-4">
+            <li th:each="ticket:${tickets}" th:text="${ticket}" class="text-gray-700"></li>
+        </ul>
+        <div class="flex justify-between mt-4">
+            <button type="button" id="cancel-btn" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition">Cancel</button>
+            <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">Confirm</button>
+        </div>
     </div>
 </div>
 
 <script>
     document.getElementById("cancel-btn").addEventListener("click", function() {
-        document.getElementById("purchase-panel").remove();
+        document.getElementById("overlay").remove();
     });
 </script>

@@ -111,10 +111,8 @@ public class HTMXcontroller {
         return "seating";
     }
     @PostMapping("seating/purchase/{id}")
-    public String purchaseFlight(Model model, @PathVariable int id, @RequestParam Map<String, List<String>> tickets) {
-        System.out.println(tickets.get("tickets"));
-        //System.out.println(payload.get("tickets"));
-        //model.addAttribute("tickets", payload.get("tickets"));
+    public String purchaseFlight(Model model, @PathVariable int id, @RequestBody Map<String, List<String>> tickets) {
+        model.addAttribute("tickets", tickets.get("tickets"));
         return "fragments/purchaseConfirmation";
     }
 

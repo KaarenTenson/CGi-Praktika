@@ -17,7 +17,10 @@ public class Seat {
         this.rightSeat = rightSeat;
         this.leftSeat = leftSeat;
         this.seatType = seatType;
-        this.isAvailable = new Random().nextBoolean();
+        if(seatType.equals("seat")){
+        this.isAvailable = new Random().nextBoolean();}else {
+            this.isAvailable = false;
+        }
     }
     public String getSeatType() {
         return seatType;
