@@ -1,22 +1,16 @@
 package com.example.cgi_praktika.API.dao.Controller;
 //import lombok.RequiredArgsConstructor;
 import com.example.cgi_praktika.API.dao.DataObjects.Flight;
-import com.example.cgi_praktika.API.dao.DataObjects.Ticket;
+import com.example.cgi_praktika.API.dao.Service.DbFlightService;
 import com.example.cgi_praktika.API.dao.Service.FlightService;
 import com.example.cgi_praktika.API.dao.Service.InMemoryFlightService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.Part;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 
@@ -24,7 +18,7 @@ public class HTMXcontroller {
     public int pageSize=30;
     private final FlightService flightService;
     @Autowired
-    public HTMXcontroller(InMemoryFlightService flightService) {
+    public HTMXcontroller(DbFlightService flightService) {
         this.flightService = flightService;
     }
     @RequestMapping("/")

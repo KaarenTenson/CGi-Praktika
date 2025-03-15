@@ -12,7 +12,7 @@ import java.util.*;
 
 @Service
 public class InMemoryFlightService implements FlightService {
-    ArrayList<Flight> flights = new ArrayList<>();
+    List<Flight> flights;
 
     public InMemoryFlightService() {
        flights= GenerateFlights.generateFlights();
@@ -57,8 +57,8 @@ public class InMemoryFlightService implements FlightService {
     }
 
     @Override
-    public ArrayList<Flight> getSortedFlights(String destination, String column, Boolean asc) {
-        ArrayList<Flight> sortedFlights = getAllFlightsByDestination(destination);
+    public List<Flight> getSortedFlights(String destination, String column, Boolean asc) {
+        List<Flight> sortedFlights = getAllFlightsByDestination(destination);
         switch (column){
             case "flightTime":
                 sortedFlights.sort(Comparator.comparing(Flight::getFlightTime));
@@ -81,7 +81,7 @@ public class InMemoryFlightService implements FlightService {
     @Override
     public List<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice,
                                                 LocalDateTime minTime, LocalDateTime maxTime, String sorting, Boolean asc) {
-        ArrayList<Flight> filteredFlights = new ArrayList<>();
+        List<Flight> filteredFlights = new ArrayList<>();
         for (Flight flight : flights) {
             if(departure!=null)
                 if(!flight.getDeparture().equals(departure)){continue;}

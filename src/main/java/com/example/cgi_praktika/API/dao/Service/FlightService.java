@@ -10,9 +10,9 @@ import java.util.List;
 public interface FlightService {
     public List<Flight> getAllFlights();
     public Flight getFlightById(int id);
-    public ArrayList<Flight> getAllFlightsByDestination(String dest);
-    public ArrayList<String> getDestinations();
-    public ArrayList<Flight> getSortedFlights(String destination, String column, Boolean asc);
+    public List<Flight> getAllFlightsByDestination(String dest);
+    public List<String> getDestinations();
+    public List<Flight> getSortedFlights(String destination, String column, Boolean asc);
     public List<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice, LocalDateTime minTime, LocalDateTime maxTime, String sorting, Boolean asc);
     public List<int[]> validateTickets(List<int[]> tickets, Flight flight);
     public void purchaseTickets(List<int[]> tickets, Flight flight);

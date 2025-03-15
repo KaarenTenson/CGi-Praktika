@@ -1,13 +1,28 @@
 package com.example.cgi_praktika.API.dao.DataObjects;
 
-import java.util.Random;
+import jakarta.persistence.*;
 
+import java.util.Random;
+@Entity
+@Table(name = "SEAT")
 public class Seat {
-    private final int row;
-    private final int column;
-    private final float footRoom;
-    private final String seatType;
+    @Id
+    private Long id;
+    @Column(nullable = false)
+    private int row;
+    @Column(nullable = false)
+    private int column;
+    @Column
+    private float footRoom;
+    @Column(nullable = false)
+    private String seatType;
+    @Column(nullable = false)
     private boolean isAvailable;
+    @ManyToOne
+    @JoinColumn(name = "flight_id")
+    private Flight flight;
+
+
     public Seat(int rowID, int column, float footRoom, String seatType) {
         this.row = rowID;
         this.column = column;
@@ -18,6 +33,11 @@ public class Seat {
             this.isAvailable = false;
         }
     }
+
+    public Seat() {
+
+    }
+
     public String getSeatType() {
         return seatType;
     }
@@ -39,5 +59,13 @@ public class Seat {
     }
     public boolean getIsAvailable() {
         return isAvailable;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
