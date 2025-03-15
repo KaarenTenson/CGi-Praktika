@@ -6,16 +6,12 @@ public class Seat {
     private final int row;
     private final int column;
     private final float footRoom;
-    private final Seat rightSeat;
-    private final Seat leftSeat;
     private final String seatType;
     private boolean isAvailable;
-    public Seat(int rowID, int column, float footRoom, Seat rightSeat, Seat leftSeat, String seatType) {
+    public Seat(int rowID, int column, float footRoom, String seatType) {
         this.row = rowID;
         this.column = column;
         this.footRoom = footRoom;
-        this.rightSeat = rightSeat;
-        this.leftSeat = leftSeat;
         this.seatType = seatType;
         if(seatType.equals("seat")){
         this.isAvailable = new Random().nextBoolean();}else {
@@ -38,13 +34,6 @@ public class Seat {
         return footRoom;
     }
 
-    public Seat getRightSeat() {
-        return rightSeat;
-    }
-
-    public Seat getLeftSeat() {
-        return leftSeat;
-    }
     public void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
     }

@@ -38,9 +38,9 @@ public class GenerateFlights {
                 windows[i][1]=1;}
             for (int j = 0; j < 7; j++) {
                 if(j==3){
-                    seats[i][j]=new Seat(i, j, 0.5f, null, null, "passThrough");
+                    seats[i][j]=new Seat(i, j, 0.5f,"passThrough");
                 }else{
-                seats[i][j]=new Seat(i, j, 0.5f, null, null, "seat");}
+                seats[i][j]=new Seat(i, j, 0.5f, "seat");}
 
 
             }

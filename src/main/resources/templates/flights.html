@@ -185,11 +185,6 @@ function  changePageState(event) {
     event.preventDefault();
 
     const destination = document.getElementById("destination").value.trim();
-    if (!destination) {
-        alert("Please enter a destination.");
-        return;
-    }
-
     const departure = document.getElementById("departure").value.trim();
     const minPrice = document.getElementById("minPrice").value.trim();
     const maxPrice = document.getElementById("maxPrice").value.trim();

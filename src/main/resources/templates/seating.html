@@ -237,28 +237,6 @@
         }
         return result
     }
-    function purchaseSeats() {
-        const tickets = getTickets();
-        console.log("Tickets:", tickets); // Debugging
-        var JsonData=JSON.stringify({"tickets": tickets});
-        console.log(JsonData);
-        htmx.logAll();
-        htmx.ajax('POST', '/seating/purchase/' + flightId, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            swap: 'afterbegin',
-            target: 'body',
-            values: JsonData,
-            ext:"json-enc"
-
-        }).then(function(response) {
-            console.log('Response:', response);
-        }).catch(function(error) {
-            console.error('Error:', error);
-        });
-    }
-
 
     document.querySelectorAll('td').forEach(function(seat) {
         if (seat.classList.contains('bg-green-500')) {

@@ -3,6 +3,7 @@ package com.example.cgi_praktika.API.dao.Service;
 import com.example.cgi_praktika.API.dao.DataGeneration.GenerateFlights;
 import com.example.cgi_praktika.API.dao.DataObjects.Flight;
 import com.example.cgi_praktika.API.dao.DataObjects.Seat;
+import com.example.cgi_praktika.API.dao.DataObjects.Seating;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -120,5 +121,28 @@ public class InMemoryFlightService implements FlightService {
         }
 
         return filteredFlights;
+    }
+
+    @Override
+    public List<int[]> validateTickets(List<int[]> tickets, Flight flight) {
+        Seating seating= flight.getSeats();
+        List<int[]> validTickets=new ArrayList<>();
+        for (int[] ticket: tickets){
+            Seat seat=seating.getSeat(ticket[0], ticket[1]);
+            if(seat==null){continue;}
+            if(seat.getIsAvailable()){
+                validTickets.add(ticket);
+            }
+        }
+        return validTickets;
+    }
+
+    @Override
+    public void purchaseTickets(List<int[]> tickets, Flight flight) {
+        Seating seating= flight.getSeats();
+        for (int[] ticket: tickets){
+            Seat seat=seating.getSeat(ticket[0], ticket[1]);
+            seat.setIsAvailable(false);
+        }
     }
 }

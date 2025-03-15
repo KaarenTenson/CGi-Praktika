@@ -14,5 +14,7 @@ public interface FlightService {
     public ArrayList<String> getDestinations();
     public ArrayList<Flight> getSortedFlights(String destination, String column, Boolean asc);
     public List<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice, LocalDateTime minTime, LocalDateTime maxTime, String sorting, Boolean asc);
+    public List<int[]> validateTickets(List<int[]> tickets, Flight flight);
+    public void purchaseTickets(List<int[]> tickets, Flight flight);
 
 }
