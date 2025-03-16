@@ -6,7 +6,7 @@
       java -jar failnimi
       ```
     - Kui see on tehtud, saad tulemusi vaadata, minnes oma brauseris aadressile `http://localhost:8080`.
-    - On võimalik, et tuleb oodata mõned sekundid, kuna rakenduse käivitamisel täidetakse andmete sisestamine andmebaasi.
+    - On võimalik, et tuleb oodata mõned sekundid, kuna rakenduse käivitamisel täidetakse andmebaas andmetega.
 
 ---
 
