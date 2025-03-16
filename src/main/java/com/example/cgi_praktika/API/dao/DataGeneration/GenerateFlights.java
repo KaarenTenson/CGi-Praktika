@@ -8,7 +8,7 @@ import com.example.cgi_praktika.API.dao.Repositry.FlightRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
-
+//generates data for application
 public class GenerateFlights {
     public static void generateFlights(FlightRepository flightRepository) {
         ArrayList<Flight> flights = new ArrayList<>();

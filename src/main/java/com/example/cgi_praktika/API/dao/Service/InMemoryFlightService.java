@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-//this outdated, used this for developing the project
+//this is outdated, used this for developing the project
 @Service
 public class InMemoryFlightService implements FlightService {
     List<Flight> flights;

@@ -60,7 +60,7 @@ public class DbFlightService implements FlightService {
 
         return flights;
     }
-
+    //checks if chosen tickets are valid(tickets exist and are available)
     @Override
     public List<int[]> validateTickets(List<int[]> tickets, Flight flight) {
         List<int[]> validTickets = new ArrayList<>();

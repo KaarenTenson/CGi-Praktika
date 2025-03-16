@@ -27,6 +27,7 @@
             <!-- Selected seats will be added here -->
         </ul>
         <p id="price" class="mt-4 text-lg font-bold">Total: $0</p>
+        <!--with this button tickets are purchased-->
         <button class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition"
                 id="purchase-btn"
                 hx-swap="afterbegin"
@@ -40,10 +41,11 @@
     <!-- Seat Type Legend -->
     <div class="flex justify-center space-x-4 mb-4">
         <div class="flex items-center"><div class="w-5 h-5 bg-green-500 border border-gray-300 mr-2"></div> Seat</div>
-        <div class="flex items-center"><div class="w-5 h-5 bg-blue-500 border border-gray-300 mr-2"></div> Door</div>
+        <div class="flex items-center"><div class="w-5 h-5 bg-blue-500 border border-gray-300 mr-2"></div> Window</div>
         <div class="flex items-center"><div class="w-5 h-5 bg-red-500 border border-gray-300 mr-2"></div> Occupied</div>
         <div class="flex items-center"><div class="w-5 h-5 bg-gray-300 border border-gray-500 mr-2"></div> Pass through</div>
     </div>
+    <!-- Elements for recommending seats -->
     <div class="flex flex-col items-center space-y-4 p-4 bg-gray-100 rounded-lg shadow-md">
         <div class="flex items-center space-x-2">
             <label for="seatCount" class="text-gray-700 font-medium">Choose number of seats:</label>
@@ -96,7 +98,6 @@
     const tickets=[]
     const seats =  /*[[${flight.getSeatMatrix()}]]*/ null;
     const windows =  /*[[${flight.getWindowMatrix(flight.getSeatMatrix().length)}]]*/ null;
-    //console.log(seats)
     function seatSelectedEvent(event){
         const seatElement = event.target;
         selectSeat(seatElement);
@@ -149,14 +150,6 @@
         const priceText = document.querySelector("#price");
         priceText.innerText = "Total: $" + (price * ticketList.children.length);
     }
-    function getTickets(){
-        const ticketsList=document.querySelectorAll("#tickets li");
-        const ticketNames=[];
-        ticketsList.forEach(function(ticket){
-            ticketNames.push(ticket.getAttribute("data-seat"));
-        })
-        return ticketNames;
-    }
     function clearTickets(){
         const ticketsList=document.querySelectorAll("#tickets li");
         ticketsList.forEach(function(ticket){
@@ -184,6 +177,7 @@
 
 
     }
+    //if good seats are not found with findgoodseats function this function is used
     function findNotSoGoodSeats(numberOfSeats){
         let seatRecommended=0;
         let res=[];
