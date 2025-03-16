@@ -9,12 +9,13 @@ import java.util.List;
 
 public interface FlightService {
     public List<Flight> getAllFlights();
-    public Flight getFlightById(int id);
+    public Flight getFlightById(Long id);
     public List<Flight> getAllFlightsByDestination(String dest);
     public List<String> getDestinations();
-    public List<Flight> getSortedFlights(String destination, String column, Boolean asc);
     public List<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice, LocalDateTime minTime, LocalDateTime maxTime, String sorting, Boolean asc);
     public List<int[]> validateTickets(List<int[]> tickets, Flight flight);
     public void purchaseTickets(List<int[]> tickets, Flight flight);
+    public List<String> getAllDestinationsThatContainString(String destination);
+    public List<String> getAllDeparturesThatContainString(String departure);
 
 }

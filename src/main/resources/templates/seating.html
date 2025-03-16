@@ -60,17 +60,17 @@
     <div class="bg-gray-100 p-6 rounded-lg shadow-lg border border-gray-400 w-fit mx-auto">
         <table class="border-collapse border border-gray-300 mx-auto bg-white rounded-lg shadow-md">
             <tbody>
-            <tr th:each="row : ${flight.seats.getPlaneStructure()}" class="even:bg-gray-50">
+            <tr th:each="row : ${flight.getSeatMatrix()}" class="even:bg-gray-50">
                 <!-- Left Window -->
                 <td class="w-10"
-                    th:classappend="${flight.seats.windows[row[0].row][0]==1} ? 'bg-blue-400 rounded-md shadow-sm' : 'invisible'">
+                    th:classappend="${flight.getWindowMatrix(flight.getSeatMatrix().length)[row[0].row][0]==1} ? 'bg-blue-400 rounded-md shadow-sm' : 'invisible'">
                 </td>
 
                 <!-- Seats -->
                 <td th:each="seat : ${row}"
                     th:text="${seat.row} + ' - ' + ${seat.column}"
                     th:attr="id=${seat.row} + '-' + ${seat.column}"
-                    th:if="${seat.seatType}"
+                    th:if="${seat.getSeatType()}"
                     th:classappend="
                         ${seat.seatType == 'passThrough'} ? 'invisible' :
                         (${seat.seatType == 'door'} ? 'bg-blue-700 text-white font-bold' :
@@ -82,7 +82,7 @@
 
                 <!-- Right Window -->
                 <td class="w-10"
-                    th:classappend="${flight.seats.windows[row[0].row][1]==1} ? 'bg-blue-400 rounded-md shadow-sm' : 'invisible'">
+                    th:classappend="${flight.getWindowMatrix(flight.getSeatMatrix().length)[row[0].getRow()][1]==1} ? 'bg-blue-400 rounded-md shadow-sm' : 'invisible'">
                 </td>
             </tr>
             </tbody>
@@ -93,10 +93,9 @@
 
 <script th:inline="javascript">
     const price = /*[[${flight.price}]]*/ 0;
-    const flightId = /*[[${flight.id}]]*/ 0;
     const tickets=[]
-    const seats =  /*[[${flight.seats.getPlaneStructure()}]]*/ null;
-    const windows =  /*[[${flight.seats.getWindows()}]]*/ null;
+    const seats =  /*[[${flight.getSeatMatrix()}]]*/ null;
+    const windows =  /*[[${flight.getWindowMatrix(flight.getSeatMatrix().length)}]]*/ null;
     //console.log(seats)
     function seatSelectedEvent(event){
         const seatElement = event.target;
@@ -168,6 +167,10 @@
         clearTickets()
         const numberOfSeats=parseInt(document.getElementById("seatCount").value);
         const nearWindows=document.getElementById("nearWindow").value;
+
+        if(!numberOfSeats || numberOfSeats <= 0){
+            return;
+        }
         const result=findGoodSeats(windows, nearWindows ? 1 : 0.25, numberOfSeats);
         if(result.length!==0){
             result.forEach(function (seat){
@@ -204,10 +207,7 @@
             for(const column in seats[row]){
                 let seatsFound=[];
                 let points=0;
-                for( let i = parseInt(column); i < (parseInt(column) + numberOfSeats); i++){
-                    if(i >= seats[row].length){
-                        break;
-                    }
+                for( let i = parseInt(column); i < seats[row].length; i++){
                     if(seats[row][i].isAvailable){
                         seatsFound.push(seats[row][i])
                         points++;
@@ -217,8 +217,8 @@
                     }else if (seats[row-1]!=null && seats[row-1][i].isAvailable){
                         seatsFound.push(seats[row][i])
                         points+=0.5;
-                    }else{
-                        break;
+                    }else if(seats[row][i].seatType==='passThrough'){
+                        continue;
                     }
                     if(i===0&&windows[row][0]===1){
                         points+=windowPoints;

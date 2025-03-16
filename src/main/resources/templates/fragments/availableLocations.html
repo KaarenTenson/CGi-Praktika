@@ -1,0 +1,10 @@
+<div>
+  <button
+          type="button"
+          th:each="location : ${locations}"
+          class="border p-2 rounded-lg shadow-md bg-white"
+          th:text="${location}"
+          th:attr="onclick='document.getElementById(\'' + ${type} + '\').value=\'' + ${location} + '\'; this.parentElement.remove();'"
+  >
+  </button>
+</div>

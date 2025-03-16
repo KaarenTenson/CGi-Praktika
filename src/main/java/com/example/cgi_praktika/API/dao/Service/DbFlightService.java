@@ -1,12 +1,19 @@
 package com.example.cgi_praktika.API.dao.Service;
 
+import com.example.cgi_praktika.API.dao.DataGeneration.GenerateFlights;
 import com.example.cgi_praktika.API.dao.DataObjects.Flight;
-import com.example.cgi_praktika.API.dao.Repositry.Repositry;
+import com.example.cgi_praktika.API.dao.DataObjects.Seat;
+import com.example.cgi_praktika.API.dao.Repositry.FlightRepository;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class DbFlightService implements FlightService {
@@ -16,16 +23,19 @@ public class DbFlightService implements FlightService {
     @Autowired
     public DbFlightService(FlightRepository flightRepository) {
         this.flightRepository = flightRepository;
+        if(flightRepository.findAll().isEmpty()) {
+            GenerateFlights.generateFlights(flightRepository);
+        }
+
     }
 
     @Override
     public List<Flight> getAllFlights() {
         return flightRepository.findAll();
     }
-
     @Override
-    public Flight getFlightById(int id) {
-        return flightRepository.findById(id).orElse(null);
+    public Flight getFlightById(Long id) {
+        return flightRepository.findByIdWithSeats(id).orElse(null);
     }
 
     @Override
@@ -39,45 +49,50 @@ public class DbFlightService implements FlightService {
     }
 
     @Override
-    public List<Flight> getSortedFlights(String destination, String column, Boolean asc) {
-        // Sorting dynamically
-        List<Flight> flights = flightRepository.findByDestination(destination);
-        flights.sort((a, b) -> {
-            int order = asc ? 1 : -1;
-            switch (column) {
-                case "price": return Float.compare(a.getPrice(), b.getPrice()) * order;
-                case "departureTime": return a.getDepartureTime().compareTo(b.getDepartureTime()) * order;
-                case "flightTime": return Float.compare(a.getFlightTime(), b.getFlightTime()) * order;
-                default: return 0;
-            }
-        });
-        return flights;
-    }
-
-    @Override
     public List<Flight> getFilteredFlights(int page, String departure, String destination, Integer minPrice, Integer maxPrice, LocalDateTime minTime, LocalDateTime maxTime, String sorting, Boolean asc) {
-        List<Flight> flights = flightRepository.filterFlights(departure, destination, minPrice, maxPrice, minTime, maxTime);
-        flights.sort((a, b) -> {
-            int order = asc ? 1 : -1;
-            switch (sorting) {
-                case "price": return Float.compare(a.getPrice(), b.getPrice()) * order;
-                case "departureTime": return a.getDepartureTime().compareTo(b.getDepartureTime()) * order;
-                case "flightTime": return Float.compare(a.getFlightTime(), b.getFlightTime()) * order;
-                default: return 0;
-            }
-        });
+        List<Flight> flights;
+        if(sorting!=null){
+        Sort sort = (asc) ? Sort.by(sorting).ascending() : Sort.by(sorting).descending();
+            flights = flightRepository.filterFlights(departure, destination, minPrice, maxPrice, minTime, maxTime, sort);
+        }else{
+            flights = flightRepository.filterFlights(departure, destination, minPrice, maxPrice, minTime, maxTime, null);
+        }
+
         return flights;
     }
 
     @Override
     public List<int[]> validateTickets(List<int[]> tickets, Flight flight) {
-        // For now, just return the input (seat validation logic can be added)
-        return tickets;
+        List<int[]> validTickets = new ArrayList<>();
+        if(flight == null) {
+            return new ArrayList<>();
+        }
+        for (int[] ticket : tickets) {
+            Seat seat= flight.getSeat(ticket[0], ticket[1]);
+            if(seat == null || !seat.getIsAvailable()) {
+                continue;
+            }
+            validTickets.add(ticket);
+        }
+
+        return validTickets;
     }
 
+    @Transactional
     @Override
     public void purchaseTickets(List<int[]> tickets, Flight flight) {
-        // Placeholder logic (add ticket purchase logic later)
-        System.out.println("Tickets purchased for flight ID: " + flight.getId());
+        for (int[] ticket : tickets) {
+            Seat seat = flight.getSeat(ticket[0], ticket[1]);
+            if (seat != null && seat.getIsAvailable()) {
+                seat.setIsAvailable(false);
+            }
+        }
+        flightRepository.save(flight);
+    }
+    public List<String> getAllDestinationsThatContainString(String destination) {
+        return flightRepository.findAllDestinationsThatContainString(destination);
+    }
+    public List<String> getAllDeparturesThatContainString(String departure) {
+        return flightRepository.findAllDeparturesThatContainString(departure);
     }
 }

@@ -2,7 +2,6 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-    <!-- Link to Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
@@ -16,7 +15,13 @@
                    class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                    placeholder="Enter destination"
                    th:value="${destination}"
+                   hx-trigger="keyup[target.value.length > 1] changed delay:0.1s"
+                   hx-get="/find/destination"
+                   hx-include="destination"
+                   hx-target="#destination-search-result"
+                   hx-swap="innerHTML"
             >
+            <div id="destination-search-result"></div>
         </div>
         <div>
             <label for="departure" class="block text-sm font-medium text-gray-700">Departure</label>
@@ -24,7 +29,13 @@
                    class="w-full p-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                    placeholder="Enter departure location"
                    th:value="${departure}"
+                   hx-trigger="keyup[target.value.length > 1]  changed delay:0.1s"
+                   hx-get="/find/departure"
+                   hx-include="departure"
+                   hx-target="#departure-search-result"
+                   hx-swap="innerHTML"
             >
+            <div id="departure-search-result"></div>
         </div>
 
 
@@ -172,7 +183,7 @@
             <button th:if="${pages > 2 && page!=pages}"
                     th:text="${pages}"
                     th:data-url="@{'/page/' + ${pages} + ${filtered.isEmpty()&&sorting==null? '':'/filtered?'} +  ${filtered} + ${sorting != null ? '&sorting=' + sorting : ''} + ${sorting != null ? '&asc=' + asc : ''}}"
-                    onclick="window.location.href=this.getAttribute('data-url')"
+                    onclick="this.getAttribute('data-url')"
                     class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring focus:ring-blue-300">
             </button>
         </div>
@@ -202,7 +213,7 @@ function  changePageState(event) {
 
 
     const url = `/page/${page}/filtered?${params.toString()}`;
-    window.location.href = url;
+    window.location.href=url;
 }
 </script>
 </body>

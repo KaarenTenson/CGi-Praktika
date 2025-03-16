@@ -7,6 +7,7 @@ import java.util.Random;
 @Table(name = "SEAT")
 public class Seat {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private int row;
@@ -19,7 +20,7 @@ public class Seat {
     @Column(nullable = false)
     private boolean isAvailable;
     @ManyToOne
-    @JoinColumn(name = "flight_id")
+    @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
 
 
@@ -34,8 +35,12 @@ public class Seat {
         }
     }
 
+
     public Seat() {
 
+    }
+    public void setFlight(Flight flight) {
+        this.flight = flight;
     }
 
     public String getSeatType() {

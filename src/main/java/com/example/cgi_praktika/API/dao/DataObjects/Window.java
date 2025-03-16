@@ -6,13 +6,14 @@ import jakarta.persistence.*;
 @Table(name = "WINDOW")
 public class Window {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private int row;
     @Column(nullable = false)
     private int column;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "flight_id")
+    @JoinColumn(name = "flight_id", nullable = false)
     private Flight flight;
 
     public Window(int column, int row) {
@@ -23,7 +24,9 @@ public class Window {
     public Window() {
 
     }
-
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
     public void setId(Long id) {
         this.id = id;
     }
@@ -35,7 +38,7 @@ public class Window {
     public int getRow() {
         return row;
     }
-   public int getColumn() {
+    public int getColumn() {
         return column;
    }
 }

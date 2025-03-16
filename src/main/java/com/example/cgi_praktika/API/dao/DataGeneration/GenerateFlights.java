@@ -2,17 +2,15 @@ package com.example.cgi_praktika.API.dao.DataGeneration;
 
 import com.example.cgi_praktika.API.dao.DataObjects.Flight;
 import com.example.cgi_praktika.API.dao.DataObjects.Seat;
-import com.example.cgi_praktika.API.dao.DataObjects.Seating;
+import com.example.cgi_praktika.API.dao.DataObjects.Window;
+import com.example.cgi_praktika.API.dao.Repositry.FlightRepository;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class GenerateFlights {
-    public static ArrayList<Flight> generateFlights() {
+    public static void generateFlights(FlightRepository flightRepository) {
         ArrayList<Flight> flights = new ArrayList<>();
         float[] pricePool= {30f, 20f, 23f, 30f, 18f, 40f};
         String[] destinationPool={"Tartu", "Tallinn", "Riia", "Helsingi", "New York", "Tokyo"};
@@ -20,33 +18,47 @@ public class GenerateFlights {
         float[] flightTimePool={20f, 14f, 1000f, 200f, 40f, 30f, 30};
         LocalDateTime time= LocalDateTime.now();
         Random r=new Random();
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 500; i++) {
             float price = pricePool[r.nextInt(pricePool.length)];
             String destination = destinationPool[r.nextInt(destinationPool.length)];
             String departure = departurePool[r.nextInt(departurePool.length)];
             float flightTime = flightTimePool[r.nextInt(flightTimePool.length)];
-            flights.add(new Flight(destination,departure,time, flightTime, price, generateSeating()));
+            saveFlight(destination, departure, time,flightTime,price, flightRepository);
         }
-        return flights;
+
     }
-    public static Seating generateSeating() {
-        Seat[][] seats=new Seat[30][7];
-        int[][] windows=new int[30][2];
+    public static void saveFlight( String destination, String departure, LocalDateTime time, float flightTime, float price, FlightRepository flightRepository) {
+        ArrayList<Seat> seats=new ArrayList<>();
+        ArrayList<Window> windows=new ArrayList<>();
+        Flight flight= new Flight(destination, departure, time, price, flightTime, seats, windows);
         for (int i = 0; i < 30; i++) {
             if(i%2==0){
-                windows[i][0]=1;
-                windows[i][1]=1;}
+                Window leftWindow=new Window(0, i);
+                leftWindow.setFlight(flight);
+                Window rightWindow=new Window(1, i);
+                rightWindow.setFlight(flight);
+                windows.add(leftWindow);
+                windows.add(rightWindow);
+                ;}
             for (int j = 0; j < 7; j++) {
                 if(j==3){
-                    seats[i][j]=new Seat(i, j, 0.5f,"passThrough");
+                    Seat newSeat= new Seat(i, j, 0.5f,"passThrough");
+                    newSeat.setFlight(flight);
+                    seats.add(newSeat);
+
                 }else{
-                seats[i][j]=new Seat(i, j, 0.5f, "seat");}
+                    Seat newSeat= new Seat(i, j, 0.5f,"seat");
+                    newSeat.setFlight(flight);
+                    seats.add(newSeat);
+                }
 
 
             }
 
         }
-        return new Seating(seats, windows);
+
+        flightRepository.save(flight);
+
     }
 
 }

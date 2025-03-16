@@ -1,21 +1,18 @@
 package com.example.cgi_praktika.API.dao.Service;
 
-import com.example.cgi_praktika.API.dao.DataGeneration.GenerateFlights;
 import com.example.cgi_praktika.API.dao.DataObjects.Flight;
 import com.example.cgi_praktika.API.dao.DataObjects.Seat;
-import com.example.cgi_praktika.API.dao.DataObjects.Seating;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
-
+//this outdated, used this for developing the project
 @Service
 public class InMemoryFlightService implements FlightService {
     List<Flight> flights;
 
     public InMemoryFlightService() {
-       flights= GenerateFlights.generateFlights();
+       flights= new ArrayList<>();
     }
 
     @Override
@@ -24,9 +21,9 @@ public class InMemoryFlightService implements FlightService {
     }
 
     @Override
-    public Flight getFlightById(int id) {
+    public Flight getFlightById(Long id) {
         for (Flight flight : flights) {
-            if (flight.getId() == id) {
+            if (Objects.equals(flight.getId(), id)) {
                 return flight;
             }
         }
@@ -56,27 +53,6 @@ public class InMemoryFlightService implements FlightService {
         return new ArrayList<>(destinations);
     }
 
-    @Override
-    public List<Flight> getSortedFlights(String destination, String column, Boolean asc) {
-        List<Flight> sortedFlights = getAllFlightsByDestination(destination);
-        switch (column){
-            case "flightTime":
-                sortedFlights.sort(Comparator.comparing(Flight::getFlightTime));
-                break;
-            case "departureTime":
-                sortedFlights.sort(Comparator.comparing(Flight::getDepartureTime));
-                break;
-            case "price":
-                sortedFlights.sort(Comparator.comparing(Flight::getPrice));
-                break;
-
-            default:
-                System.out.println("error sorting flights");
-                break;
-        }
-
-        return sortedFlights;
-    }
 
     @Override
     public List<Flight> getFilteredFlights(int Page, String departure, String destination, Integer minPrice, Integer maxPrice,
@@ -125,10 +101,9 @@ public class InMemoryFlightService implements FlightService {
 
     @Override
     public List<int[]> validateTickets(List<int[]> tickets, Flight flight) {
-        Seating seating= flight.getSeats();
         List<int[]> validTickets=new ArrayList<>();
         for (int[] ticket: tickets){
-            Seat seat=seating.getSeat(ticket[0], ticket[1]);
+            Seat seat=flight.getSeat(ticket[0], ticket[1]);
             if(seat==null){continue;}
             if(seat.getIsAvailable()){
                 validTickets.add(ticket);
@@ -139,10 +114,19 @@ public class InMemoryFlightService implements FlightService {
 
     @Override
     public void purchaseTickets(List<int[]> tickets, Flight flight) {
-        Seating seating= flight.getSeats();
         for (int[] ticket: tickets){
-            Seat seat=seating.getSeat(ticket[0], ticket[1]);
+            Seat seat=flight.getSeat(ticket[0], ticket[1]);
             seat.setIsAvailable(false);
         }
+    }
+
+    @Override
+    public List<String> getAllDestinationsThatContainString(String destination) {
+        return List.of();
+    }
+
+    @Override
+    public List<String> getAllDeparturesThatContainString(String departure) {
+        return List.of();
     }
 }
